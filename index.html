@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title>IMC EU Option Coverage</title>
+  <style>
+    :root{
+      --imc-navy:#003865; --imc-sky:#0082ba; --imc-bg:#0a2c52;
+      --glass-bg:rgba(255,255,255,0.08); --glass-brd:rgba(255,255,255,0.25);
+      --text:#eaf3fb; --muted:#b7c7d7; --focus:#1abaff;
+      --row-bdr: rgba(255,255,255,0.12);
+    }
+    html{scroll-behavior:smooth} *{box-sizing:border-box}
+
+    body{
+      margin:0; font-family:Calibri, Verdana, Arial, sans-serif; color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 70% 10%, rgba(0,130,186,0.18), transparent 60%),
+        linear-gradient(180deg,#0b2a4a 0%, var(--imc-navy) 60%, #06203a 100%);
+      min-height:100dvh; overflow-x:hidden;
+    }
+
+    .header{
+      position:sticky; top:0; z-index:1000; backdrop-filter:blur(10px);
+      background:linear-gradient(180deg, rgba(0,56,101,0.92), rgba(0,56,101,0.65));
+      border-bottom:1px solid rgba(255,255,255,0.10);
+      padding:16px 22px; display:flex; align-items:center; gap:18px;
+    }
+    .brand img{height:48px}
+
+    .hero{
+      position:relative; min-height:36vh; display:flex; align-items:flex-end;
+      padding:40px 24px 24px;
+      background-image:url("IMC_kaart_29_03_2025_CMYK_background__1_.jpg");
+      background-size:cover; background-position:center;
+      filter:brightness(1.05) contrast(1.15); isolation:isolate;
+    }
+    .hero::before{content:""; position:absolute; inset:0;
+      background:radial-gradient(90% 60% at 50% 30%, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.25) 100%)}
+    .hero::after{content:""; position:absolute; inset:0;
+      background:linear-gradient(180deg, rgba(0,56,101,0.35) 0%, rgba(0,56,101,0.55) 60%, rgba(0,56,101,0.70) 100%);
+      mix-blend-mode:multiply}
+    .hero-content{max-width:1100px; width:100%; margin:0 auto; position:relative; z-index:1; text-shadow:0 3px 14px rgba(0,0,0,.35); text-align:center;}
+    .title{font-size:clamp(26px,4.4vw,46px); margin:0; color:#fff}
+
+    .toolbar{
+      width:min(1100px, 92%); margin: 16px auto 0; display:grid; gap:14px;
+    }
+    .tabs{
+      display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px;
+    }
+    .tab{
+      background: var(--glass-bg);
+      border:1px solid var(--glass-brd);
+      color:#e8f6ff; text-align:center; padding:12px 10px; border-radius:12px;
+      font-weight:700; cursor:pointer; user-select:none;
+      transition:transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
+    }
+    .tab:hover{ transform:translateY(-1px); box-shadow:0 8px 20px rgba(0,0,0,.25); }
+    .tab.active{ background: linear-gradient(180deg, var(--imc-sky), #0074a3); border-color: transparent; }
+
+    .controls{
+      display:flex; justify-content:center; align-items:center; gap:12px; flex-wrap:wrap;
+      background: var(--glass-bg); border:1px solid var(--glass-brd);
+      padding:10px 20px; border-radius:12px; width:fit-content; margin:0 auto;
+    }
+    .controls label{ font-size:12px; color:#cfe9f9; margin-right:6px; letter-spacing:.3px; text-transform:uppercase; }
+    .select{
+      appearance:none; background:rgba(255,255,255,0.06); color:#fff; border:1px solid var(--glass-brd);
+      padding:8px 10px; border-radius:10px; min-width:220px; font-family:inherit; font-size:14px;
+      backdrop-filter: blur(6px);
+    }
+    .select:focus-visible{ outline:2px solid var(--focus); outline-offset:2px; }
+
+    .container{ width:min(1100px, 92%); margin: 16px auto 60px; }
+
+    .table-wrap{
+      overflow:auto; background:var(--glass-bg); border:1px solid var(--glass-brd);
+      border-radius:16px; box-shadow:0 14px 40px rgba(0,0,0,.30); backdrop-filter:blur(8px);
+    }
+    table{ width:100%; border-collapse:collapse; min-width:700px; }
+    thead th{
+      position:sticky; top:0; background:rgba(0,56,101,0.85); color:#eaf3fb;
+      font-weight:800; font-size:13px; letter-spacing:.3px; text-transform:uppercase;
+      padding:12px; border-bottom:1px solid var(--row-bdr); text-align:left;
+    }
+    tbody td{
+      padding:12px; border-bottom:1px solid var(--row-bdr); font-size:15px; vertical-align:middle;
+    }
+    tbody tr:hover{ background:rgba(255,255,255,0.04); }
+
+    footer{text-align:center; color:var(--muted); padding:36px 12px 48px; font-size:12px}
+
+    td a { color:#9bd5ff; text-decoration:none; border-bottom:1px dashed rgba(155,213,255,.6); }
+    td a:hover { text-decoration:underline; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="brand"><img src="IMC_Logo_White.png" alt="IMC" /></div>
+  </header>
+
+  <section class="hero" id="top">
+    <div class="hero-content">
+      <h1 class="title">IMC EU Option Coverage</h1>
+    </div>
+  </section>
+
+  <section class="toolbar">
+    <div class="tabs" role="tablist" aria-label="Option Type">
+      <div class="tab" role="tab" aria-selected="false" tabindex="0" data-type="index">Index Options</div>
+      <div class="tab active" role="tab" aria-selected="true" tabindex="0" data-type="single">Single Stock Options</div>
+      <div class="tab" role="tab" aria-selected="false" tabindex="0" data-type="fx">FX Options</div>
+    </div>
+
+    <div class="controls">
+      <label for="sectorSelect">Sector</label>
+      <select id="sectorSelect" class="select">
+        <option value="ALL">All Sectors</option>
+      </select>
+    </div>
+  </section>
+
+  <main class="container">
+    <div class="table-wrap">
+      <table id="coverageTable" aria-live="polite">
+        <thead>
+          <tr></tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer>© IMC Trading — Internal demo.</footer>
+
+  <script>
+    /* ===== Sector map ===== */
+    const COMPANY_SECTORS = {
+      "ABN":"Banks","ACA":"Banks","AGN":"Banks","ALV":"Banks","ASRNL":"Banks","BNP":"Banks","CBK":"Banks","CS":"Banks","DBK":"Banks","GLE":"Banks","INGA":"Banks","ISP":"Banks","MUV2":"Banks","NN":"Banks","UCG":"Banks","URW":"Banks","VNA":"Banks",
+      "ADYEN":"Technology","ASM":"Technology","ASML":"Technology","BESI":"Technology","IFX":"Technology","ORA":"Technology","PRX":"Technology","SAP":"Technology","STMPA":"Technology","STLAP":"Automobiles",
+      "AI":"Industrials","AIR":"Industrials","BAS":"Industrials","BAYN":"Industrials","RHM":"Industrials","SAF":"Industrials","SIE":"Industrials","SU":"Industrials","DG":"Industrials","EN":"Industrials","HEI":"Industrials","MT":"Industrials","SGO":"Industrials",
+      "BMW":"Automobiles","DTG":"Automobiles","MBG":"Automobiles","P911":"Automobiles","PAH3":"Automobiles","RACE":"Automobiles","RNO":"Automobiles","VOW3":"Automobiles",
+      "FRVIA":"Automobile Components","ML":"Automobile Components",
+      "ADS":"Textiles, Apparel & Luxury Goods","BEI":"Textiles, Apparel & Luxury Goods","BN":"Textiles, Apparel & Luxury Goods","BOSS":"Textiles, Apparel & Luxury Goods","CA":"Textiles, Apparel & Luxury Goods","EL":"Textiles, Apparel & Luxury Goods","HEIA":"Textiles, Apparel & Luxury Goods","KER":"Textiles, Apparel & Luxury Goods","MC":"Textiles, Apparel & Luxury Goods","OR":"Textiles, Apparel & Luxury Goods","PUM":"Textiles, Apparel & Luxury Goods","RI":"Textiles, Apparel & Luxury Goods","RMS":"Textiles, Apparel & Luxury Goods","CFR":"Textiles, Apparel & Luxury Goods",
+      "DTE":"Telecoms",
+      "ENEL":"Utilities","ENGI":"Utilities","EOAN":"Utilities","RWE":"Utilities","VIE":"Utilities",
+      "ENI":"Energy","SHELL":"Energy","TTE":"Energy",
+      "NESN":"Food & Beverage","ZAL":"Textiles, Apparel & Luxury Goods"
+    };
+
+    /* ===== Names ===== */
+    const NAMES_ONLY={
+      ABN:"ABN AMRO Bank NV", ACA:"Crédit Agricole SA", ADS:"Adidas AG", ADYEN:"Adyen NV", AGN:"Aegon NV",
+      AI:"Air Liquide SA", AIR:"Airbus SE", ALV:"Allianz SE", ASM:"ASM International NV", ASML:"ASML Holding NV",
+      ASRNL:"ASR Nederland NV", BAS:"BASF SE", BAYN:"Bayer AG", BEI:"Beiersdorf AG", BESI:"BE Semiconductor Industries NV",
+      BMW:"Bayerische Motoren Werke AG", BN:"Danone SA", BNP:"BNP Paribas SA", BOSS:"HUGO BOSS AG", CA:"Carrefour SA",
+      CFR:"Compagnie Financière Richemont SA", CBK:"Commerzbank AG", CS:"AXA SA", DBK:"Deutsche Bank AG", DG:"VINCI SA",
+      DTE:"Deutsche Telekom AG", DTG:"Daimler Truck Holding AG", EL:"EssilorLuxottica SA", EN:"Bouygues SA",
+      ENEL:"Enel SpA", ENGI:"Engie SA", ENI:"Eni SpA", EOAN:"E.ON SE", FRVIA:"FORVIA SE", HEI:"Heidelberg Materials AG",
+      HEIA:"Heineken NV", GLE:"Société Générale SA", IFX:"Infineon Technologies AG", INGA:"ING Groep NV",
+      ISP:"Intesa Sanpaolo SpA", KER:"Kering SA", MBG:"Mercedes-Benz Group AG", MC:"LVMH Moët Hennessy Louis Vuitton SE",
+      ML:"Michelin SCA", MT:"ArcelorMittal SA", MUV2:"Münchener Rückversicherungs-Gesellschaft AG", NESN:"Nestlé SA",
+      NN:"NN Group NV", OR:"L'Oréal SA", ORA:"Orange SA", P911:"Porsche AG", PAH3:"Porsche Automobil Holding SE",
+      PRX:"Prosus NV", PUM:"PUMA SE", RACE:"Ferrari NV", RHM:"Rheinmetall AG", RI:"Pernod Ricard SA",
+      RMS:"Hermès International SCA", RNO:"Renault SA", RWE:"RWE AG", SAF:"Safran SA", SAP:"SAP SE",
+      SGO:"Compagnie de Saint-Gobain SA", SHELL:"Shell Plc", SIE:"Siemens AG", STLAP:"Stellantis NV",
+      STMPA:"STMicroelectronics NV", SU:"Schneider Electric SE",
+      TTE:"TotalEnergies SE", UCG:"UniCredit SpA",
+      URW:"Unibail-Rodamco-Westfield SE", VIE:"Veolia Environnement SA", VNA:"Vonovia SE",
+      VOW3:"Volkswagen AG", ZAL:"Zalando SE"
+    };
+
+    /* ===== Display tickers (Eurex / Euronext) ===== */
+    const EUREX_TICKER = {
+      ABN:"AAR", ADS:"ADS", ADYEN:"ADY", AGN:"AEN", AI:"AIR", AIR:"EAD", ALV:"ALV", MT:"ISPA",
+      ASM:"ASM", ASML:"ASM", ASRNL:"ASR", CS:"AXA", BAS:"BAS", BAYN:"BAY", BMW:"BMW",
+      BESI:"BSI", BEI:"BEI", BNP:"BNP", EN:"BYG", CA:"CAR", CBK:"CBK", SGO:"GOB", CFR:"CFR",
+      GLE:"SGE", ACA:"XCA", DTG:"DTG", BN:"BSN", DBK:"DBK", DTE:"DTE", EOAN:"EOA", ENEL:"ENL5",
+      ENGI:"GZF", ENI:"ENT5", EL:"ESL", RACE:"2FE", FRVIA:"FAU", HEI:"HEI", HEIA:"HNK",
+      RMS:"HMI", BOSS:"BOSS", IFX:"IFX", INGA:"INNE", ISP:"IES5", KER:"PPX", OR:"LOR",
+      MC:"MOH", MBG:"DAI", MUV2:"MUV2", NESN:"NESE", NN:"NNG", ORA:"FTE", RI:"PER",
+      P911:"PAG", PAH3:"POR3", PRX:"PRX", PUM:"PUM", RHM:"RHM", RWE:"RWE", SAF:"SEJ",
+      SAP:"SAP", SU:"SND", SHELL:"ROY", SIE:"SIE", STLAP:"FIA5", STMPA:"SGM",
+      TTE:"TTE", URW:"TOTE", UCG:"CRI5", VIE:"VVD", DG:"SQU", VOW3:"VOW", VNA:"ANN", ZAL:"ZAL", ML:"MCHE", RNO:"RNL"
+    };
+    const EURONEXT_TICKER = {
+      ABN:"ABN", ADS:"ADQ", ADYEN:"ADY", AGN:"AGN", AI:"AI1", AIR:"EA1", ALV:"AZQ", MT:"MT",
+      ASM:"ASM", ASML:"ASL", ASRNL:"ASR", CS:"CS1", BAS:"BFQ", BAYN:"BYQ", BMW:"BWQ",
+      BESI:"BESM", BEI:"BEQ", BNP:"BWQ", EN:"EN1", CA:"CA4", CBK:"CBQ", SGO:"SG1", CFR:null,
+      GLE:"GL1", ACA:"CR1", DTG:"DTQ", BN:"DA1", DBK:"DBQ", DTE:"TKQ", EOAN:"EOQ", ENEL:"ENE3",
+      ENGI:"GA1", ENI:"ENI3", EL:"EF1", RACE:"RAC5", FRVIA:"EO1", HEI:"HDQ", HEIA:"HEI",
+      RMS:"HE1", BOSS:null, IFX:"NTQ", INGA:"ING", ISP:"ISP3", KER:"KR1", OR:"OR1", MC:"MC1",
+      MBG:"MBQ", MUV2:"MRQ", NESN:null, NN:"NN", ORA:"FT1", RI:"RI1", P911:"PAQ",
+      PAH3:"PPQ", PRX:"PRX", PUM:null, RHM:"RZ1", RWE:"RWQ", SAF:"SM1", SAP:"APQ", SU:"SU1",
+      SHELL:"RD9", SIE:"MHQ", STLAP:"UG1", STMPA:"STE", TTE:"TO1", URW:"UL1",
+      UCG:"UCG", VIE:"Vi1", DG:"DG1", VNA:"VVQ", ZAL:"ZLQ", ML:"ML1", RNO:"RN1"
+    };
+
+    /* ===== Index: BBG + Exchange tickers + Block sizes ===== */
+    const INDEX_BBG_TICKER = {
+      "SX5E":"SX5E Index","SX7E":"SX7E Index","SXXP":"SXXP Index","V2X":"V2X Index","DAX":"DAX Index",
+      "SMI":"SMI Index","FTSEMIB":"FTSEMIB Index","CAC":"CAC Index","AEX":"AEX Index","FTSE":"UKX Index",
+      "ES":"ES1 Index","NKY":"NKY Index"
+    };
+    const INDEX_EXCHANGE_TICKER = {
+      "AEX":"AEX","CAC":"PXA","DAX":"DAX","V2X":"VSTOXX","SX7E":"OESB","FTSE":"ESXM",
+      "FTSEMIB":"MIB","NKY":"IDOXP.225","ES":"E4B","SXXP":"OXXP","SMI":"OSMI","SX5E":"OESX"
+    };
+    const BLOCK_SIZE_INDEX_RAW = {
+      "SX5E":"1000","SX7E":"3000","SXXP":"1000","V2X":"1000","DAX":"350","SMI":"300",
+      "FTSEMIB":"80","CAC":"200","AEX":"500","FTSE":"500","ES":"100"
+    };
+    const normalizeIndexKey = (k)=> (k||"").toUpperCase().replace(/\(.*?\)/g,"").replace(/\s+/g,"").trim();
+    const getIndexBlockSize = (symbol)=>{
+      const key = normalizeIndexKey(symbol);
+      const fixed = key === "SX73E" ? "SX7E" : key;
+      return BLOCK_SIZE_INDEX_RAW[fixed] || "—";
+    };
+    const show = (v)=> (v===null || v===undefined || v==='') ? "—" : v;
+
+    /* ===== Single stock: BBG ticker map ===== */
+    const SINGLE_BBG_TICKER = {
+      "ABN":"ABN NA Equity","ACA":"ACA FP Equity","AGN":"AGN NA Equity","ALV":"ALV GY Equity","ASRNL":"ASRNL NA Equity",
+      "BNP":"BNP FP Equity","CBK":"CBK GY Equity","CS":"CS FP Equity","DBK":"DBK GY Equity","GLE":"GLE FP Equity",
+      "INGA":"INGA NA Equity","ISP":"ISP IM Equity","MUV2":"MUV2 GY Equity","NN":"NN NA Equity","UCG":"UCG IM Equity",
+      "URW":"URW FP Equity","VNA":"VNA GY Equity",
+      "ADYEN":"ADYEN NA Equity","ASM":"ASM NA Equity","ASML":"ASML NA Equity","BESI":"BESI NA Equity","IFX":"IFX GY Equity",
+      "ORA":"ORA FP Equity","PRX":"PRX NA Equity","SAP":"SAP GY Equity","STMPA":"STMPA FP Equity",
+      "AI":"AI FP Equity","AIR":"AIR FP Equity","BAS":"BAS GY Equity","BAYN":"BAYN GY Equity","RHM":"RHM GY Equity",
+      "SAF":"SAF FP Equity","SIE":"SIE GY Equity","SU":"SU FP Equity","DG":"DG FP Equity","EN":"EN FP Equity",
+      "HEI":"HEI GY Equity","MT":"MT NA Equity","SGO":"SGO FP Equity",
+      "BMW":"BMW GY Equity","DTG":"DTG GY Equity","MBG":"MBG GY Equity","P911":"P911 GY Equity","PAH3":"PAH3 GY Equity",
+      "RACE":"RACE IM Equity","RNO":"RNO FP Equity","VOW3":"VOW3 GY Equity",
+      "FRVIA":"FRVIA FP Equity","ML":"ML FP Equity",
+      "ADS":"ADS GY Equity","BEI":"BEI GY Equity","BN":"BN FP Equity","BOSS":"BOSS GY Equity","CA":"CA FP Equity",
+      "EL":"EL FP Equity","HEIA":"HEIA NA Equity","KER":"KER FP Equity","MC":"MC FP Equity","OR":"OR FP Equity",
+      "PUM":"PUM GY Equity","RI":"RI FP Equity","RMS":"RMS FP Equity",
+      "DTE":"DTE GY Equity",
+      "ENEL":"ENEL IM Equity","ENGI":"ENGI FP Equity","EOAN":"EOAN GY Equity","RWE":"RWE GY Equity","VIE":"VIE FP Equity",
+      "ENI":"ENI IM Equity","SHELL":"SHELL NA Equity","TTE":"TTE FP Equity",
+      "NESN":"NESN SW Equity","ZAL":"ZAL GY Equity",
+      "STLAP":"STLAM IM Equity",
+      "CFR":"CFR SW Equity"
+    };
+
+    /* ===== Single stock block sizes ===== */
+    const RESULT_LIST = [
+      {'Eurex MBTS': '1000','Euronext LIS post-trade': ' 1,975 ','Name': 'ABN AMRO Bank NV','Ticker': 'ABN'},
+      {'Eurex MBTS': '1,250','Euronext LIS post-trade': ' 4,035 ','Name': 'Crédit Agricole SA','Ticker': 'ACA'},
+      {'Eurex MBTS': '200','Euronext LIS post-trade': ' 260 ','Name': 'Adidas AG','Ticker': 'ADS'},
+      {'Eurex MBTS': '250','Euronext LIS post-trade': ' 425 ','Name': 'Adyen NV','Ticker': 'ADYEN'},
+      {'Eurex MBTS': '1500','Euronext LIS post-trade': ' 2,190 ','Name': 'Aegon NV','Ticker': 'AGN'},
+      {'Eurex MBTS': '200','Euronext LIS post-trade': ' 175 ','Name': 'Air Liquide SA','Ticker': 'AI'},
+      {'Eurex MBTS': '300','Euronext LIS post-trade': ' 1,340 ','Name': 'Airbus SE','Ticker': 'AIR'},
+      {'Eurex MBTS': '150','Euronext LIS post-trade': ' 300 ','Name': 'Allianz SE','Ticker': 'ALV'},
+      {'Eurex MBTS': '100','Euronext LIS post-trade': ' 250 ','Name': 'ASM International NV','Ticker': 'ASM'},
+      {'Eurex MBTS': '75','Euronext LIS post-trade': ' 250 ','Name': 'ASML Holding NV','Ticker': 'ASML'},
+      {'Eurex MBTS': '100','Euronext LIS post-trade': ' 285 ','Name': 'ASR Nederland NV','Ticker': 'ASRNL'},
+      {'Eurex MBTS': '400','Euronext LIS post-trade': ' 400 ','Name': 'BASF SE','Ticker': 'BAS'},
+      {'Eurex MBTS': '750','Euronext LIS post-trade': ' 2,050 ','Name': 'Bayer AG','Ticker': 'BAYN'},
+      {'Eurex MBTS': '300','Euronext LIS post-trade': ' 300 ','Name': 'Beiersdorf AG','Ticker': 'BEI'},
+      {'Eurex MBTS': '250','Euronext LIS post-trade': ' 500 ','Name': 'BE Semiconductor Industries NV','Ticker': 'BESI'},
+      {'Eurex MBTS': '400','Euronext LIS post-trade': ' 625 ','Name': 'Bayerische Motoren Werke AG','Ticker': 'BMW'},
+      {'Eurex MBTS': '400','Euronext LIS post-trade': ' 245 ','Name': 'Danone SA','Ticker': 'BN'},
+      {'Eurex MBTS': '300','Euronext LIS post-trade': ' 890 ','Name': 'BNP Paribas SA','Ticker': 'BNP'},
+      {'Eurex MBTS': '250','Euronext LIS post-trade': null,'Name': 'HUGO BOSS AG','Ticker': 'BOSS'},
+      {'Eurex MBTS': '750','Euronext LIS post-trade': ' 835 ','Name': 'Carrefour SA','Ticker': 'CA'},
+      {'Eurex MBTS': '250','Euronext LIS post-trade': null,'Name': 'Compagnie Financière Richemont SA','Ticker': 'CFR'},
+      {'Eurex MBTS': '1250','Euronext LIS post-trade': ' 3,700 ','Name': 'Commerzbank AG','Ticker': 'CBK'},
+      {'Eurex MBTS': '1250','Euronext LIS post-trade': ' 1,665 ','Name': 'AXA SA','Ticker': 'CS'},
+      {'Eurex MBTS': '2,500','Euronext LIS post-trade': ' 3,710 ','Name': 'Deutsche Bank AG','Ticker': 'DBK'},
+      {'Eurex MBTS': '250','Euronext LIS post-trade': ' 280 ','Name': 'VINCI SA','Ticker': 'DG'},
+      {'Eurex MBTS': '1500','Euronext LIS post-trade': ' 2,245 ','Name': 'Deutsche Telekom AG','Ticker': 'DTE'},
+      {'Eurex MBTS': '50','Euronext LIS post-trade': ' 335 ','Name': 'Daimler Truck Holding AG','Ticker': 'DTG'},
+      {'Eurex MBTS': '200','Euronext LIS post-trade': ' 100 ','Name': 'EssilorLuxottica SA','Ticker': 'EL'},
+      {'Eurex MBTS': '400','Euronext LIS post-trade': ' 460 ','Name': 'Bouygues SA','Ticker': 'EN'},
+      {'Eurex MBTS': '500','Euronext LIS post-trade': ' 1,670 ','Name': 'Enel SpA','Ticker': 'ENEL'},
+      {'Eurex MBTS': '1000','Euronext LIS post-trade': ' 3,625 ','Name': 'Engie SA','Ticker': 'ENGI'},
+      {'Eurex MBTS': '250','Euronext LIS post-trade': ' 775 ','Name': 'Eni SpA','Ticker': 'ENI'},
+      {'Eurex MBTS': '1500','Euronext LIS post-trade': ' 2,500 ','Name': 'E.ON SE','Ticker': 'EOAN'},
+      {'Eurex MBTS': '100','Euronext LIS post-trade': null,'Name': 'FORVIA SE','Ticker': 'FRVIA'},
+      {'Eurex MBTS': '300','Euronext LIS post-trade': ' 300 ','Name': 'Heidelberg Materials AG','Ticker': 'HEI'},
+      {'Eurex MBTS': '250','Euronext LIS post-trade': ' 360 ','Name': 'Heineken NV','Ticker': 'HEIA'},
+      {'Eurex MBTS': '650','Euronext LIS post-trade': ' 2,300 ','Name': 'Société Générale SA','Ticker': 'GLE'},
+      {'Eurex MBTS': '1000','Euronext LIS post-trade': ' 1,690 ','Name': 'Infineon Technologies AG','Ticker': 'IFX'},
+      {'Eurex MBTS': '2,250','Euronext LIS post-trade': ' 3,640 ','Name': 'ING Groep NV','Ticker': 'INGA'},
+      {'Eurex MBTS': '500','Euronext LIS post-trade': ' 1,575 ','Name': 'Intesa Sanpaolo SpA','Ticker': 'ISP'},
+      {'Eurex MBTS': '100','Euronext LIS post-trade': ' 180 ','Name': 'Kering SA','Ticker': 'KER'},
+      {'Eurex MBTS': '500','Euronext LIS post-trade': null,'Name': 'Mercedes-Benz Group AG','Ticker': 'MBG'},
+      {'Eurex MBTS': '100','Euronext LIS post-trade': ' 80 ','Name': 'LVMH Moët Hennessy Louis Vuitton SE','Ticker': 'MC'},
+      {'Eurex MBTS': '150','Euronext LIS post-trade': ' 365 ','Name': 'Michelin SCA','Ticker': 'ML'},
+      {'Eurex MBTS': '1000','Euronext LIS post-trade': ' 2,385 ','Name': 'ArcelorMittal SA','Ticker': 'MT'},
+      {'Eurex MBTS': '100','Euronext LIS post-trade': ' 200 ','Name': 'Münchener Rückversicherungs-Gesellschaft AG','Ticker': 'MUV2'},
+      {'Eurex MBTS': '500','Euronext LIS post-trade': null,'Name': 'Nestlé SA','Ticker': 'NESN'},
+      {'Eurex MBTS': '250','Euronext LIS post-trade': '705','Name': 'NN Group NV','Ticker': 'NN'},
+      {'Eurex MBTS': '100','Euronext LIS post-trade': ' 140 ','Name': "L'Oréal SA",'Ticker': 'OR'},
+      {'Eurex MBTS': '1,500','Euronext LIS post-trade': ' 2,910 ','Name': 'Orange SA','Ticker': 'ORA'},
+      {'Eurex MBTS': '75','Euronext LIS post-trade': ' 400 ','Name': 'Porsche AG','Ticker': 'P911'},
+      {'Eurex MBTS': '350','Euronext LIS post-trade': ' 1,275 ','Name': 'Porsche Automobil Holding SE','Ticker': 'PAH3'},
+      {'Eurex MBTS': '300','Euronext LIS post-trade': ' 905 ','Name': 'Prosus NV','Ticker': 'PRX'},
+      {'Eurex MBTS': '75','Euronext LIS post-trade': null,'Name': 'PUMA SE','Ticker': 'PUM'},
+      {'Eurex MBTS': '100','Euronext LIS post-trade': ' 80 ','Name': 'Ferrari NV','Ticker': 'RACE'},
+      {'Eurex MBTS': '50','Euronext LIS post-trade': ' 150 ','Name': 'Rheinmetall AG','Ticker': 'RHM'},
+      {'Eurex MBTS': '150','Euronext LIS post-trade': ' 225 ','Name': 'Pernod Ricard SA','Ticker': 'RI'},
+      {'Eurex MBTS': '25','Euronext LIS post-trade': ' 260 ','Name': 'Hermès International SCA','Ticker': 'RMS'},
+      {'Eurex MBTS': '400','Euronext LIS post-trade': ' 575 ','Name': 'Renault SA','Ticker': 'RNO'},
+      {'Eurex MBTS': '1000','Euronext LIS post-trade': ' 1,690 ','Name': 'RWE AG','Ticker': 'RWE'},
+      {'Eurex MBTS': '150','Euronext LIS post-trade': ' 200 ','Name': 'Safran SA','Ticker': 'SAF'},
+      {'Eurex MBTS': '200','Euronext LIS post-trade': ' 300 ','Name': 'SAP SE','Ticker': 'SAP'},
+      {'Eurex MBTS': '300','Euronext LIS post-trade': '395','Name': 'Compagnie de Saint-Gobain SA','Ticker': 'SGO'},
+      {'Eurex MBTS': '1250','Euronext LIS post-trade': ' 1,755 ','Name': 'Shell Plc','Ticker': 'SHELL'},
+      {'Eurex MBTS': '200','Euronext LIS post-trade': ' 3,500 ','Name': 'Siemens AG','Ticker': 'SIE'},
+      {'Eurex MBTS': '200','Euronext LIS post-trade': ' 615 ','Name': 'Stellantis NV','Ticker': 'STLAP'},
+      {'Eurex MBTS': '500','Euronext LIS post-trade': ' 325 ','Name': 'STMicroelectronics NV','Ticker': 'STMPA'},
+      {'Eurex MBTS': '200','Euronext LIS post-trade': ' 300 ','Name': 'Schneider Electric SE','Ticker': 'SU'},
+      {'Eurex MBTS': '750','Euronext LIS post-trade': '900','Name': 'TotalEnergies SE','Ticker': 'TTE'},
+      {'Eurex MBTS': '500','Euronext LIS post-trade': ' 315 ','Name': 'UniCredit SpA','Ticker': 'UCG'},
+      {'Eurex MBTS': '300','Euronext LIS post-trade': ' 750 ','Name': 'Unibail-Rodamco-Westfield SE','Ticker': 'URW'},
+      {'Eurex MBTS': '250','Euronext LIS post-trade': ' 1,050 ','Name': 'Veolia Environnement SA','Ticker': 'VIE'},
+      {'Eurex MBTS': '750','Euronext LIS post-trade': ' 1,920 ','Name': 'Vonovia SE','Ticker': 'VNA'},
+      {'Eurex MBTS': '200','Euronext LIS post-trade': null,'Name': 'Volkswagen AG ','Ticker': 'VOW3'},
+      {'Eurex MBTS': '400','Euronext LIS post-trade': ' 510 ','Name': 'Zalando SE','Ticker': 'ZAL'}
+    ];
+    const _cleanVal = (v) => { if (v == null) return null; const s=String(v).replace(/,/g,'').trim(); return s===""?"manual check":s; };
+    const DIRECT_EUREX_BLOCK={}, DIRECT_EURONEXT_BLOCK={};
+    for (const r of RESULT_LIST) {
+      DIRECT_EUREX_BLOCK[r.Ticker]=_cleanVal(r['Eurex MBTS']);
+      DIRECT_EURONEXT_BLOCK[r.Ticker]=_cleanVal(r['Euronext LIS post-trade']);
+    }
+    const getEurexBlock = (k)=> (k in DIRECT_EUREX_BLOCK?DIRECT_EUREX_BLOCK[k]:"manual check");
+    const getEuronextBlock = (k)=> (k in DIRECT_EURONEXT_BLOCK?DIRECT_EURONEXT_BLOCK[k]:"manual check");
+
+    /* ===== Universes ===== */
+    const UNIVERSE = {
+      single: Object.keys(COMPANY_SECTORS),
+      index: ["SX5E (1000)", "SX7E", "SXXP", "V2X", "DAX", "SMI", "FTSEMIB", "CAC", "AEX", "FTSE", "ES", "NKY"],
+      fx: Array.from(new Set([
+        "EUCO","PUCO","UFCO","AUCO","UYCO","NUCO",
+        "EURUSD","GBPUSD","USDCHF","AUDUSD","USDJPY","NZDUSD"
+      ]))
+    };
+
+    /* ===== Utils ===== */
+    const sectorsByName = () => {
+      const map = {};
+      for (const [c,s] of Object.entries(COMPANY_SECTORS)){ (map[s] ||= []).push(c); }
+      for (const s of Object.keys(map)) map[s].sort();
+      return Object.fromEntries(Object.entries(map).sort((a,b)=> a[0].localeCompare(b[0])));
+    };
+    const populateSectorDropdown = ()=>{
+      const sel = document.getElementById("sectorSelect");
+      const secs = Object.keys(sectorsByName());
+      for (const s of secs){
+        const opt = document.createElement("option");
+        opt.value = s; opt.textContent = s;
+        sel.appendChild(opt);
+      }
+    };
+
+    /* ===== FX helpers ===== */
+    const LISTED_TO_PAIR = {
+      EUCO:"EUR/USD", PUCO:"GBP/USD", UFCO:"USD/CHF", AUCO:"AUD/USD",
+      UYCO:"USD/JPY", NUCO:"NZD/USD"
+    };
+    const FX_BBG_TICKER = {
+      EUCO:"EURUSD Curncy", PUCO:"GBPUSD Curncy", UFCO:"USDCHF Curncy", AUCO:"AUDUSD Curncy",
+      UYCO:"USDJPY Curncy", NUCO:"NZDUSD Curncy"
+    };
+    const EUREX_LINKS = {
+      AUCO: "https://www.eurex.com/ex-en/markets/fx/currency-pairs/Options-on-AUD-USD-Futures-950536",
+      EUCO: "https://www.eurex.com/ex-en/markets/fx/currency-pairs/Options-on-EUR-USD-Futures-950954",
+      UYCO: "https://www.eurex.com/ex-en/markets/fx/currency-pairs/Options-on-EUR-USD-Futures-950954g",
+      PUCO: "https://www.eurex.com/ex-en/markets/fx/currency-pairs/Options-on-GBP-USD-Futures-951060",
+      NUCO: "https://www.eurex.com/ex-en/markets/fx/currency-pairs/Options-on-NZD-USD-Futures-950548",
+      UFCO: "https://www.eurex.com/ex-en/markets/fx/currency-pairs/Options-on-USD-CHF-Futures-951034"
+    };
+    function formatEurexLink(code){
+      if (!code || code === "—") return "—";
+      const url = EUREX_LINKS[code];
+      return url ? `<a href="${url}" target="_blank" rel="noopener noreferrer" title="Open on Eurex">${code}</a>` : code;
+    }
+
+    const getFxBbg = (sym) => {
+      if (FX_BBG_TICKER[sym]) return FX_BBG_TICKER[sym];
+      if (/^[A-Z]{6}$/.test(sym)) return sym + " Curncy";
+      return "—";
+    };
+    const pairText = (sym) => {
+      if (LISTED_TO_PAIR[sym]) return LISTED_TO_PAIR[sym];
+      if (/^[A-Z]{6}$/.test(sym)) return sym.slice(0,3) + "/" + sym.slice(3);
+      return sym;
+    };
+    const LISTED_FX_BLOCK_SIZE = "1";
+    const fxEurexCode = (sym) => (LISTED_TO_PAIR[sym] ? sym : "—");
+    const fxBlockSize = (sym) => (LISTED_TO_PAIR[sym] ? LISTED_FX_BLOCK_SIZE : "—");
+
+    const CME_CODE_BY_PAIR = {
+      "AUD/USD":"ADU", "EUR/USD":"EUU", "GBP/USD":"GBU",
+      "NZD/USD":"6N", "USD/CHF":"CHU", "USD/JPY":"JPU"
+    };
+    const CME_BLOCK_SIZE = {
+      "ADU":"250", "EUU":"250", "GBU":"250", "6N":"50", "CHU":"250", "JPU":"250"
+    };
+    const CME_FX_LINKS = {
+      "EUU":"https://www.cmegroup.com/markets/fx/g10/euro-fx.contractSpecs.options.html",
+      "ADU":"https://www.cmegroup.com/markets/fx/g10/australian-dollar.contractSpecs.options.html",
+      "GBU":"https://www.cmegroup.com/markets/fx/g10/british-pound.contractSpecs.options.html",
+      "6N":"https://www.cmegroup.com/markets/fx/g10/new-zealand-dollar.quotes.html",
+      "CHU":"https://www.cmegroup.com/markets/fx/g10/swiss-franc.html",
+      "JPU":"https://www.cmegroup.com/markets/fx/g10/japanese-yen.contractSpecs.options.html"
+    };
+    function fxCmeCode(sym){
+      const p = pairText(sym);
+      return CME_CODE_BY_PAIR[p] || "—";
+    }
+    function fxCmeBlockSize(sym){
+      const code = fxCmeCode(sym);
+      return code && CME_BLOCK_SIZE[code] ? CME_BLOCK_SIZE[code] : "—";
+    }
+    function formatCmeLink(code){
+      if (!code || code==="—") return "—";
+      const url = CME_FX_LINKS[code];
+      return url
+        ? `<a href="${url}" target="_blank" rel="noopener noreferrer" title="Open CME FX Options">${code}</a>`
+        : code;
+    }
+
+    function uniqueFxSymbols(){
+      const byPair = {};
+      for (const sym of UNIVERSE.fx){
+        const p = pairText(sym);
+        const isListed = !!LISTED_TO_PAIR[sym];
+        if (!byPair[p] || (isListed && !byPair[p].isListed)){
+          byPair[p] = { sym, isListed, pair: p };
+        }
+      }
+      return Object.values(byPair)
+        .sort((a,b)=> a.pair.localeCompare(b.pair))
+        .map(x=> x.sym);
+    }
+
+    /* ===== Render table ===== */
+    const renderTable = (type="single")=>{
+      let pool = UNIVERSE[type].slice();
+
+      if (type === "single") {
+        const sector = document.getElementById("sectorSelect").value;
+        if (sector && sector !== "ALL"){
+          pool = pool.filter(t => COMPANY_SECTORS[t] === sector);
+        }
+      }
+
+      pool.sort((a,b) => (NAMES_ONLY[a]||a).localeCompare(NAMES_ONLY[b]||b));
+
+      const theadRow = document.querySelector('#coverageTable thead tr');
+      if (type === "index") {
+        theadRow.innerHTML = `
+          <th>BBG Ticker</th>
+          <th>Name</th>
+          <th>Exchange Ticker</th>
+          <th>Block Size</th>
+        `;
+      } else if (type === "fx") {
+        theadRow.innerHTML = `
+          <th>BBG Ticker</th>
+          <th>OTC Pair</th>
+          <th>Eurex Code</th>
+          <th>Block Size</th>
+          <th>CME Block Size</th>
+          <th>CME Code</th>
+        `;
+      } else {
+        theadRow.innerHTML = `
+          <th>BBG Ticker</th>
+          <th>Name</th>
+          <th>Eurex Ticker</th>
+          <th>Eurex Block Size</th>
+          <th>Euronext Ticker</th>
+          <th>Euronext Block Size</th>
+        `;
+      }
+
+      const tbody = document.getElementById("tableBody");
+      tbody.innerHTML = "";
+
+      let symbolsToRender = pool;
+      if (type === "fx") {
+        symbolsToRender = uniqueFxSymbols();
+      }
+
+      for (const t of symbolsToRender){
+        const tr = document.createElement("tr");
+
+        if (type === "index") {
+          const k = normalizeIndexKey(t);
+          const bbg  = INDEX_BBG_TICKER[k] || "—";
+          const name = ({SX5E:"EURO STOXX 50 Index", SX7E:"EURO STOXX Banks Index", SXXP:"STOXX Europe 600 Index",
+                         V2X:"EURO STOXX 50 Volatility Index", DAX:"DAX Index", SMI:"Swiss Market Index",
+                         FTSEMIB:"FTSE MIB Index", CAC:"CAC 40 Index", AEX:"AEX Index", FTSE:"FTSE 100 Index",
+                         ES:"S&P 500 E-mini Futures", NKY:"Nikkei 225 Index"})[k] || t;
+          const exch = show(INDEX_EXCHANGE_TICKER[k]);
+          const block= show(getIndexBlockSize(t));
+          tr.innerHTML += `<td>${bbg}</td><td>${name}</td><td>${exch}</td><td>${block}</td>`;
+
+        } else if (type === "fx") {
+          const otcName = getFxBbg(t);
+          const pair    = pairText(t);
+          const eurex   = fxEurexCode(t);
+          const blk     = fxBlockSize(t);
+          const cmeBlk  = fxCmeBlockSize(t);
+          const cmeCode = fxCmeCode(t);
+          tr.innerHTML += `
+            <td>${otcName}</td>
+            <td>${pair}</td>
+            <td>${formatEurexLink(eurex)}</td>
+            <td>${blk}</td>
+            <td>${cmeBlk}</td>
+            <td>${formatCmeLink(cmeCode)}</td>
+          `;
+
+        } else {
+          const bbg   = SINGLE_BBG_TICKER[t] || "—";
+          const name  = NAMES_ONLY[t] || t;
+          const eurex = (t in EUREX_TICKER) ? EUREX_TICKER[t] : "—";
+          const eublk = show(getEurexBlock(t));
+          const enxtRaw  = (t in EURONEXT_TICKER) ? EURONEXT_TICKER[t] : "—";
+          const enxt = show(enxtRaw);
+          const enblk = show(getEuronextBlock(t));
+          tr.innerHTML += `<td>${bbg}</td><td>${name}</td><td>${eurex}</td><td>${eublk}</td><td>${enxt}</td><td>${enblk}</td>`;
+        }
+
+        document.getElementById("tableBody").appendChild(tr);
+      }
+
+      document.querySelector('.controls').style.display = type === 'single' ? 'flex' : 'none';
+    };
+
+    /* ===== Tabs + init ===== */
+    const tabs = document.querySelectorAll(".tab");
+    let currentType = "single";
+    tabs.forEach(tab=>{
+      tab.addEventListener("click", ()=>{
+        tabs.forEach(t=>{ t.classList.remove("active"); t.setAttribute("aria-selected","false"); });
+        tab.classList.add("active"); tab.setAttribute("aria-selected","true");
+        currentType = tab.dataset.type;
+        renderTable(currentType);
+      });
+      tab.addEventListener("keydown",(e)=>{ if (e.key==="Enter"||e.key===" "){ e.preventDefault(); tab.click(); } });
+    });
+
+    document.getElementById("sectorSelect").addEventListener("change", ()=> renderTable(currentType));
+
+    populateSectorDropdown();
+    renderTable("single");
+  </script>
+</body>
+</html>
